@@ -10,25 +10,30 @@ import android.widget.ListView;
 import edu.feup.stockportfolio.Portfolio;
 import edu.feup.stockportfolio.R;
 
-public class QuotesFragment extends ListFragment {
+public class QuotesListFragment extends ListFragment {
     public interface OnQuoteSelectedListener {
         public void onQuoteSelected(int position);
     }
 
     OnQuoteSelectedListener callback_;
 
+    boolean dual_pane_;
+    int current_position_ = 0;
+
     @Override
-    public void onCreate(Bundle saved_instance_state) {
-        super.onCreate(saved_instance_state);
+    public void onActivityCreated(Bundle saved_instance_state) {
+        super.onActivityCreated(saved_instance_state);
 
         setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, Portfolio.Companies));
+
+        View details_frame =  getActivity().findViewById(R.id.quotes_details);
     }
 
     @Override
     public void onStart() {
         super.onStart();
 
-        if (getFragmentManager().findFragmentById(R.id.quotes_information_fragment) != null) {
+        if (getFragmentManager().findFragmentById(R.id.quotes_details) != null) {
             getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         }
     }

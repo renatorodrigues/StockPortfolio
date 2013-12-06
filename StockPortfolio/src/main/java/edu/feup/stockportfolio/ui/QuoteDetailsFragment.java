@@ -11,7 +11,7 @@ import android.widget.TextView;
 import edu.feup.stockportfolio.Portfolio;
 import edu.feup.stockportfolio.R;
 
-public class QuoteInformationFragment extends Fragment {
+public class QuoteDetailsFragment extends Fragment {
     final static String ARG_POSITION = "position";
 
     private int current_position_ = -1;

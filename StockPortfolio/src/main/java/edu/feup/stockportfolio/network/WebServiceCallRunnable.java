@@ -1,4 +1,4 @@
-package edu.feup.busphone.util.network;
+package edu.feup.stockportfolio.network;
 
 import android.os.Handler;
 

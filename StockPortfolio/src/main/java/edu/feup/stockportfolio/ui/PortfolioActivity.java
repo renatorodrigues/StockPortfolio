@@ -8,23 +8,13 @@ import android.view.Menu;
 
 import edu.feup.stockportfolio.R;
 
-public class PortfolioActivity extends Activity implements QuotesFragment.OnQuoteSelectedListener {
+public class PortfolioActivity extends Activity implements QuotesListFragment.OnQuoteSelectedListener {
     private static final String TAG = "PortfolioActivity";
 
     @Override
     protected void onCreate(Bundle saved_instance_state) {
         super.onCreate(saved_instance_state);
-        setContentView(R.layout.quotes_and_shares);
-
-        if (findViewById(R.id.fragment_container) != null && saved_instance_state == null) {
-            if (getFragmentManager().findFragmentById(R.id.quotes_information_fragment) != null) {
-                getFragmentManager().beginTransaction().add(R.id.fragment_container, getFragmentManager().findFragmentById(R.id.quotes_information_fragment)).commit();
-            } else {
-                QuotesFragment quotes_fragment = new QuotesFragment();
-                quotes_fragment.setArguments(getIntent().getExtras());
-                getFragmentManager().beginTransaction().add(R.id.fragment_container, quotes_fragment).commit();
-            }
-        }
+        setContentView(R.layout.quotes);
     }
 
 
@@ -36,15 +26,15 @@ public class PortfolioActivity extends Activity implements QuotesFragment.OnQuot
 
     @Override
     public void onQuoteSelected(int position) {
-        QuoteInformationFragment quote_fragment = (QuoteInformationFragment) getFragmentManager().findFragmentById(R.id.quotes_information_fragment);
+        QuoteDetailsFragment quote_fragment = (QuoteDetailsFragment) getFragmentManager().findFragmentById(R.id.quotes_details);
 
         if (quote_fragment != null) {
             quote_fragment.updateQuoteView(position);
         } else {
             Log.d(TAG, "Creating new Quote Information fragment");
-            QuoteInformationFragment new_quote_fragment = new QuoteInformationFragment();
+            QuoteDetailsFragment new_quote_fragment = new QuoteDetailsFragment();
             Bundle args = new Bundle();
-            args.putInt(QuoteInformationFragment.ARG_POSITION, position);
+            args.putInt(QuoteDetailsFragment.ARG_POSITION, position);
             new_quote_fragment.setArguments(args);
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, new_quote_fragment);
