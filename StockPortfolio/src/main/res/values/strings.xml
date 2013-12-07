@@ -4,5 +4,6 @@
     <string name="app_name">StockPortfolio</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_view_shares">Shares</string>
 
 </resources>
