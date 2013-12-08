@@ -24,6 +24,8 @@ public class StockData{
     private double range_max_;
     private double range_min_;
 
+    private int today_;
+
     StockData(String company, int quantity){
         set_company(company);
         set_quantity(quantity);
@@ -52,34 +54,47 @@ public class StockData{
         market_cap_ = data[10].split("\r")[0];
     }
 
-    public void populate_history(String[] data) {
+    public void populate_history(String[] data, String today) {
         //first line is the header, data beings on the second!
         Line l = new Line();
 
         range_max_=0;
         range_min_=Double.MAX_VALUE;
 
-        int c=0;
-        for(int i=data.length-1; i>0; --i, ++c){
+        int c=0,distance=0;
+        String[] split = null;
+        String prev_date=today;
+        for(int i=data.length-1; i>0; ++c){
+
+            if(distance==0)
+                if(split!=null)
+                prev_date = split[0];
 
             //Date,Open,High,Low,Close,Volume,Adj Close
-            String[] split = data[i].split(",");
+            split = data[i].split(",");
 
-            double x = c;
-            double y = Double.valueOf(split[4]);
+            if(!should_skip(prev_date,split[0],distance)){
 
-            if(y>range_max_) range_max_=y;
-            if(y<range_min_) range_min_=y;
+                double x = c;
+                double y = Double.valueOf(split[4]);
 
-            LinePoint p = new LinePoint(x,y);
-            l.addPoint(p);
+                if(y>range_max_) range_max_=y;
+                if(y<range_min_) range_min_=y;
+
+                LinePoint p = new LinePoint(x,y);
+                l.addPoint(p);
+                --i;
+                distance=0;
+            } else {
+                ++distance;
+            }
         }
 
         //add today to graph
-        LinePoint p = new LinePoint(c,get_actual_quote());
+        /*LinePoint p = new LinePoint(c,get_actual_quote());
         l.addPoint(p);
         if(get_actual_quote()>range_max_) range_max_=get_actual_quote();
-        if(get_actual_quote()<range_min_) range_min_=get_actual_quote();
+        if(get_actual_quote()<range_min_) range_min_=get_actual_quote();*/
 
         double delta = range_max_-range_min_;
         double padding = delta*0.1;
@@ -88,6 +103,23 @@ public class StockData{
         if(range_min_<0)range_min_=0;
 
         line_graph_ = l;
+    }
+
+    private Boolean should_skip(String prev_date, String date, int i){
+
+
+        int prev_day = Integer.valueOf(prev_date.split("-")[2]);
+        int actual_day = Integer.valueOf(date.split("-")[2]);
+
+        if(prev_day==actual_day){
+            return false;
+        }
+
+        if(prev_day+1+i==actual_day || prev_day+1+i==32 ||  prev_day+1+i==33) return false;
+
+
+
+        return true;
     }
 
     public double get_actual_quote() {

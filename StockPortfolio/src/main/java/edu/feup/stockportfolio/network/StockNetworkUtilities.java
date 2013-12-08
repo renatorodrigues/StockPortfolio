@@ -15,6 +15,7 @@ public class StockNetworkUtilities extends NetworkUtilities{
     private static final String BASE_URL_SINGLE = BASE_URL + "finance.yahoo.com/d/quotes?";
     private static final String BASE_URL_HISTORY = BASE_URL + "ichart.finance.yahoo.com/table.txt?";
     private static final String SINGLE_FORMAT_QUERY = "f=snl1c1p2o0h0g0va2j1";
+
     /*  *format query parameters*
         s  = codename
         n  = formal name
@@ -36,7 +37,7 @@ public class StockNetworkUtilities extends NetworkUtilities{
         String response = get(uri);
         Log.d("REPLY",response);
 
-        company.populate_today(response.split(","));
+        company.populate_today(response.split("(,)(?=(?:[^\"]|\"[^\"]*\")*$)"));
     }
 
     public static void refresh_all_today(ArrayList<StockData> companies){
@@ -51,7 +52,7 @@ public class StockNetworkUtilities extends NetworkUtilities{
         String[] split_data = response.split("\n");
 
         for(int i=0; i<companies.size(); ++i){
-            companies.get(i).populate_today(split_data[i].split(","));
+            companies.get(i).populate_today(split_data[i].split("(,)(?=(?:[^\"]|\"[^\"]*\")*$)"));
         }
     }
 
@@ -77,7 +78,7 @@ public class StockNetworkUtilities extends NetworkUtilities{
 
         //FIRST LINE IS HEADER, DATA STARTS ON SECOND LINE!
         String[] lines = response.split("\n");
-        company.populate_history(lines);
+        company.populate_history(lines," - -"+day);
     }
 
 }
