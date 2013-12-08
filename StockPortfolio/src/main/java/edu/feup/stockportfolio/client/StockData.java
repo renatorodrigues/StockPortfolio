@@ -33,14 +33,18 @@ public class StockData{
     }
 
     public void refresh_today() {
-        StockNetworkUtilities.refresh_today(this);
+        try {
+            StockNetworkUtilities.refresh_today(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void refresh_history() {
         StockNetworkUtilities.refresh_history(this);
     }
 
-    public void populate_today(String[] data) {
+    public void populate_today(String[] data) throws Exception {
         //TODO store as string or convert to double
         formal_name_ = data[1].replace("\"","");
         quote_value_ = data[2];
@@ -52,6 +56,9 @@ public class StockData{
         volume_ = data[8];
         avg_volume_ = data[9];
         market_cap_ = data[10].split("\r")[0];
+
+        if(get_actual_quote()==0 && change_.equals("N/A"))
+            throw new Exception("Company does not exist");
     }
 
     public void populate_history(String[] data, String today) {
@@ -106,8 +113,6 @@ public class StockData{
     }
 
     private Boolean should_skip(String prev_date, String date, int i){
-
-
         int prev_day = Integer.valueOf(prev_date.split("-")[2]);
         int actual_day = Integer.valueOf(date.split("-")[2]);
 
@@ -116,8 +121,6 @@ public class StockData{
         }
 
         if(prev_day+1+i==actual_day || prev_day+1+i==32 ||  prev_day+1+i==33) return false;
-
-
 
         return true;
     }
@@ -186,21 +189,6 @@ public class StockData{
         return quantity_;
     }
 
-    @Override
-    public String toString() {
-        return get_company() + "\n"
-                + get_formal_name() + "\n"
-                + get_quote_value() + "\n"
-                + get_change() + "\n"
-                + get_change_percentage() + "\n"
-                + get_open() + "\n"
-                + get_high() + "\n"
-                + get_low() + "\n"
-                + get_volume() + "\n"
-                + get_avg_volume() + "\n"
-                + get_market_cap();
-    }
-
     public float get_range_max() {
         return (float)range_max_;
     }
@@ -209,3 +197,4 @@ public class StockData{
         return (float)range_min_;
     }
 }
+
