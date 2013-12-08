@@ -41,8 +41,8 @@ public class GlobalStock {
 
         double delta = range_max_-range_min_;
         double padding = delta*0.1;
-        range_min_ -= delta;
-        range_max_ += delta;
+        range_min_ -= padding;
+        range_max_ += padding;
         if(range_min_<0)range_min_=0;
 
         line_graph_ = l;
