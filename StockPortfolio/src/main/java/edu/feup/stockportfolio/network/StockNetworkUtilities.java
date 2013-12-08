@@ -30,7 +30,7 @@ public class StockNetworkUtilities extends NetworkUtilities{
         j1 = market cap
     */
 
-    public static void refresh_today(StockData company) {
+    public static void refresh_today(StockData company) throws Exception {
 
         String uri = BASE_URL_SINGLE + SINGLE_FORMAT_QUERY +"&s=";
         uri += company.get_company();
@@ -52,7 +52,12 @@ public class StockNetworkUtilities extends NetworkUtilities{
         String[] split_data = response.split("\n");
 
         for(int i=0; i<companies.size(); ++i){
-            companies.get(i).populate_today(split_data[i].split("(,)(?=(?:[^\"]|\"[^\"]*\")*$)"));
+            try {
+                companies.get(i).populate_today(split_data[i].split("(,)(?=(?:[^\"]|\"[^\"]*\")*$)"));
+            } catch (Exception e) {
+                //TODO company does not exist (why is it added?)
+                e.printStackTrace();
+            }
         }
     }
 
@@ -81,4 +86,14 @@ public class StockNetworkUtilities extends NetworkUtilities{
         company.populate_history(lines," - -"+day);
     }
 
+    public static StockData new_stock(String company){
+        StockData sd = new StockData(company,0);
+        try{
+            StockNetworkUtilities.refresh_today(sd);
+        } catch (Exception e){
+            return null;
+        }
+
+        return sd;
+    }
 }
