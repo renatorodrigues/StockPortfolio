@@ -20,11 +20,25 @@ public class Portfolio {
         shares_.add(new StockData("GOOG", 2));
         shares_.add(new StockData("IBM", 3));
         shares_.add(new StockData("MSFT", 1));
+        shares_.add(new StockData("TWTR", 1));
     }
 
     public ArrayList<StockData> getShares() {
         return shares_;
     }
+
+    public void addShares(String company, int shares) {
+        shares_.add(new StockData(company, shares));
+    }
+
+    public void removeShares(int index) {
+        shares_.remove(index);
+    }
+
+    public void removeShares(StockData shares) {
+        shares_.remove(shares);
+    }
+
     public int getTotal() {
         return -1;
     }

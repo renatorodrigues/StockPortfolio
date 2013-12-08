@@ -196,5 +196,25 @@ public class StockData{
     public float get_range_min() {
         return (float)range_min_;
     }
+
+    @Override
+    public String toString() {
+        return get_company() + "\n"
+                + get_formal_name() + "\n"
+                + get_quote_value() + "\n"
+                + get_change() + "\n"
+                + get_change_percentage() + "\n"
+                + get_open() + "\n"
+                + get_high() + "\n"
+                + get_low() + "\n"
+                + get_volume() + "\n"
+                + get_avg_volume() + "\n"
+                + get_market_cap();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return (o != null && o instanceof StockData && company_.equals(((StockData) o).company_));
+    }
 }
 

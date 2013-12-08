@@ -92,11 +92,7 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
 
     @Override
     public boolean canDismiss(int position) {
-        if (position == 0) {
-            return false;
-        }
-
-        return true;
+        return (position != 0);
     }
 
     @Override
@@ -112,8 +108,9 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
         if (position == 0) {
 
         } else {
-            Toast.makeText(this, "" + (position - 1), Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(PortfolioActivity.this, SharesViewActivity.class));
+            Intent intent = new Intent(PortfolioActivity.this, SharesViewActivity.class);
+            intent.putExtra(SharesViewActivity.ARG_INDEX, position - 1);
+            startActivity(intent);
         }
 
     }
@@ -164,11 +161,13 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
                 switch (type) {
                     case TYPE_PORTFOLIO:
                         convert_view = inflater_.inflate(R.layout.portfolio_list_item, null);
-                        holder.quote = (TextView) convert_view.findViewById(R.id.title);
                         break;
                     case TYPE_QUOTE:
                         convert_view = inflater_.inflate(R.layout.quote_list_item, null);
+                        holder.formal_name = (TextView) convert_view.findViewById(R.id.formal_name);
+                        holder.company = (TextView) convert_view.findViewById(R.id.company);
                         holder.quote = (TextView) convert_view.findViewById(R.id.quote);
+                        holder.change = (TextView) convert_view.findViewById(R.id.change);
                         break;
                 }
                 convert_view.setTag(holder);
@@ -178,8 +177,19 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
 
             if (type == TYPE_QUOTE) {
                 StockData stock_data = shares_.get(position - 1);
-                holder.quote.setText(stock_data.get_company());
 
+                holder.formal_name.setText(stock_data.get_formal_name());
+                holder.company.setText(stock_data.get_company());
+                holder.quote.setText(stock_data.get_quote_value());
+                holder.change.setText(stock_data.get_change() + " (" + stock_data.get_change_percentage() + ")");
+
+                int color;
+                if (stock_data.get_change().contains("+")) {
+                    color = android.R.color.holo_green_dark;
+                } else {
+                    color = android.R.color.holo_red_dark;
+                }
+                holder.change.setTextColor(StockPortfolio.context.getResources().getColor(color));
             } else {
                 Line l = new Line();
                 LinePoint p = new LinePoint(0, 5);
@@ -202,7 +212,10 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
     }
 
     public static class ViewHolder {
+        public TextView formal_name;
+        public TextView company;
         public TextView quote;
+        public TextView change;
     }
 
     @Override
