@@ -35,6 +35,8 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
+import edu.feup.stockportfolio.ui.StockPortfolio;
+
 public class NetworkUtilities {
     private static final String TAG = "NetworkUtilities";
 
@@ -82,10 +84,9 @@ public class NetworkUtilities {
     }
 
     public static boolean isNetworkAvailable() {
-        //ConnectivityManager connectivity_manager = (ConnectivityManager) BusPhone.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        //NetworkInfo active_network_info = connectivity_manager.getActiveNetworkInfo();
-        //return active_network_info != null && active_network_info.isConnected();
-        return true;
+        ConnectivityManager connectivity_manager = (ConnectivityManager) StockPortfolio.context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo active_network_info = connectivity_manager.getActiveNetworkInfo();
+        return active_network_info != null && active_network_info.isConnected();
     }
 
     public static void showNoConnectionDialog(final Context context) {

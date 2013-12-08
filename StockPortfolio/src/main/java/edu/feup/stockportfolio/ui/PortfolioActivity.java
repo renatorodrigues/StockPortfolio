@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -28,6 +30,7 @@ import edu.feup.stockportfolio.client.GlobalStock;
 import edu.feup.stockportfolio.client.Portfolio;
 import edu.feup.stockportfolio.R;
 import edu.feup.stockportfolio.client.StockData;
+import edu.feup.stockportfolio.network.NetworkUtilities;
 import edu.feup.stockportfolio.network.StockNetworkUtilities;
 import edu.feup.stockportfolio.network.WebServiceCallRunnable;
 
@@ -40,6 +43,8 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
 
     private ProgressBar progress_bar_;
     private View empty_view_;
+    private ViewStub no_connection_stub_;
+    private View no_connection_;
 
     @Override
     protected void onCreate(Bundle saved_instance_state) {
@@ -61,13 +66,27 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
         refreshShares();
     }
 
+    public void noConnection(View v) {
+        startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
+    }
+
     public void refreshShares() {
         if (shares_.isEmpty()) {
             Log.v(TAG, "no shares");
             return;
         }
 
-        empty_view_.setVisibility(View.GONE);
+        getListView().getEmptyView().setVisibility(View.GONE);
+
+        if (!NetworkUtilities.isNetworkAvailable()) {
+            no_connection_stub_ = (ViewStub) findViewById(R.id.no_connection_stub);
+            no_connection_ = no_connection_stub_.inflate();
+            getListView().setEmptyView(no_connection_);
+            NetworkUtilities.showNoConnectionDialog(PortfolioActivity.this);
+            return;
+        }
+
+        //empty_view_.setVisibility(View.GONE);
         progress_bar_.setVisibility(View.VISIBLE);
         getListView().setEmptyView(progress_bar_);
 
@@ -193,17 +212,24 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
                 holder.change.setTextColor(StockPortfolio.context.getResources().getColor(color));
             } else {
                 final GlobalStock global_stock = Portfolio.getInstance().getGlobalStock();
+                final ProgressBar progress_bar = (ProgressBar) convert_view.findViewById(R.id.progress_bar);
+                final LineGraph global_graph = (LineGraph) convert_view.findViewById(R.id.graph);;
                 if (global_stock.hasHistory()) {
+                    progress_bar.setVisibility(View.GONE);
+
                     global_stock.get_line().setShowingPoints(false);
                     global_stock.get_line().setColor(Color.parseColor("#FFBB33"));
-                    LineGraph li = (LineGraph) convert_view.findViewById(R.id.graph);
-                    li.addLine(global_stock.get_line());
-                    li.setRangeY(global_stock.get_range_min(), global_stock.get_range_max());
-                    li.setLineToFill(0);
+                    global_graph.addLine(global_stock.get_line());
+                    global_graph.setRangeY(global_stock.get_range_min(), global_stock.get_range_max());
+                    global_graph.setLineToFill(0);
+
+                    global_graph.setVisibility(View.VISIBLE);
 
                     TextView total_quotes = (TextView) convert_view.findViewById(R.id.total_quotes);
-                    total_quotes.setText(global_stock.getOwnedStock());
+                    total_quotes.setText("" + global_stock.getOwnedStock());
                 } else {
+                    progress_bar.setVisibility(View.VISIBLE);
+                    global_graph.setVisibility(View.GONE);
                     Thread refresh_global = new Thread(new WebServiceCallRunnable(new Handler()) {
                         @Override
                         public void run() {
