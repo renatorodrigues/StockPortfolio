@@ -87,7 +87,7 @@ public class StockNetworkUtilities extends NetworkUtilities{
     }
 
     public static StockData new_stock(String company){
-        StockData sd = new StockData(company,0);
+        StockData sd = new StockData(company, 0);
         try{
             StockNetworkUtilities.refresh_today(sd);
         } catch (Exception e){

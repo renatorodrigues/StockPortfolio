@@ -26,7 +26,7 @@ public class StockData{
 
     private int today_;
 
-    StockData(String company, int quantity){
+    public StockData(String company, int quantity){
         set_company(company);
         set_quantity(quantity);
         line_graph_ = new Line();

@@ -129,5 +129,5 @@ public class SharesViewActivity extends Activity {
         getMenuInflater().inflate(R.menu.view_shares, menu);
         return true;
     }
-    
+
 }

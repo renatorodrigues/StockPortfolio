@@ -1,4 +1,4 @@
-package edu.test.networktest;
+package edu.feup.stockportfolio.client;
 
 import com.echo.holographlibrary.Line;
 import com.echo.holographlibrary.LinePoint;
