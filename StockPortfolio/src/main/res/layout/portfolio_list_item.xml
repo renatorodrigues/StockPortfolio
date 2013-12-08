@@ -3,20 +3,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@drawable/card" >
+              android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/title"
-        android:textSize="20sp"
-        android:fontFamily="sans-serif-light"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Portfolio" />
+        android:orientation="vertical"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:background="@drawable/card">
 
-    <com.echo.holographlibrary.LineGraph
-        android:id="@+id/graph"
-        android:layout_width="match_parent"
-        android:layout_height="100dp" />
+        <TextView
+            android:id="@+id/title"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Portfolio" />
+
+        <com.echo.holographlibrary.LineGraph
+            android:id="@+id/graph"
+            android:layout_width="match_parent"
+            android:layout_height="100dp" />
+
+    </LinearLayout>
 
 </LinearLayout>

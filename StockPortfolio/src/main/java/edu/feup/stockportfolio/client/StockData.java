@@ -154,6 +154,14 @@ public class StockData{
         return quantity_;
     }
 
+    public float get_range_max() {
+        return (float)range_max_;
+    }
+
+    public float get_range_min() {
+        return (float)range_min_;
+    }
+
     @Override
     public String toString() {
         return get_company() + "\n"
@@ -169,11 +177,8 @@ public class StockData{
                 + get_market_cap();
     }
 
-    public float get_range_max() {
-        return (float)range_max_;
-    }
-
-    public float get_range_min() {
-        return (float)range_min_;
+    @Override
+    public boolean equals(Object o) {
+        return (o != null && company_.equals(((StockData) o).company_));
     }
 }

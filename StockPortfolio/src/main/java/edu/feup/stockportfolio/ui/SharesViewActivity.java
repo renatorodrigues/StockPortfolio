@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
+import android.widget.Toast;
 
 import com.echo.holographlibrary.Line;
 import com.echo.holographlibrary.LineGraph;
@@ -20,13 +21,32 @@ import edu.feup.stockportfolio.network.WebServiceCallRunnable;
 public class SharesViewActivity extends Activity {
     private static final String TAG = "SharesViewActivity";
 
+    public static final String ARG_INDEX = "index";
+
+    private int index_;
+    private StockData shares_;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shares_view);
 
+        Bundle extras = getIntent().getExtras();
+        index_ = extras.getInt(ARG_INDEX, -1);
+        if (index_ == -1) {
+            finish();
+            return;
+        }
 
-        Thread test_thread = new Thread(new WebServiceCallRunnable(new Handler()) {
+        Toast.makeText(this, "" + index_, Toast.LENGTH_SHORT).show();
+
+        loadHistory();
+
+    }
+
+
+    public void loadHistory() {
+        Thread history_thread = new Thread(new WebServiceCallRunnable(new Handler()) {
             @Override
             public void run() {
                 Portfolio.getIstance().getShares().get(0).refresh_history();
@@ -44,9 +64,8 @@ public class SharesViewActivity extends Activity {
                 });
             }
         });
-        test_thread.start();
+        history_thread.start();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
