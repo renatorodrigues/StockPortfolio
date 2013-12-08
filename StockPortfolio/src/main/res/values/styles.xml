@@ -17,4 +17,19 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <style name="TitleLight" parent="android:Widget.Holo.Light.TextView">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">@color/dark_gray</item>
+    </style>
+
+    <style name="LightTableCell" parent="android:Widget.Holo.Light.TextView">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="LightTableLabel" parent="LightTableCell">
+        <item name="android:layout_marginRight">20dp</item>
+    </style>
+
 </resources>

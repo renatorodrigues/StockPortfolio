@@ -211,6 +211,6 @@ public class StockData{
 
     @Override
     public boolean equals(Object o) {
-        return (o != null && company_.equals(((StockData) o).company_));
+        return (o != null && o instanceof StockData && company_.equals(((StockData) o).company_));
     }
 }
