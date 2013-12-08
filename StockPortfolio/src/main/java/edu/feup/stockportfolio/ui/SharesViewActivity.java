@@ -4,21 +4,16 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Activity;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.echo.holographlibrary.Line;
 import com.echo.holographlibrary.LineGraph;
-import com.echo.holographlibrary.LinePoint;
 
 import edu.feup.stockportfolio.R;
 import edu.feup.stockportfolio.client.Portfolio;
 import edu.feup.stockportfolio.client.StockData;
-import edu.feup.stockportfolio.network.StockNetworkUtilities;
 import edu.feup.stockportfolio.network.WebServiceCallRunnable;
 
 public class SharesViewActivity extends Activity {
@@ -35,6 +30,9 @@ public class SharesViewActivity extends Activity {
     private LineGraph history_graph_;
     private TextView quote_;
     private TextView change_;
+
+    private TextView shares_num_;
+    private TextView shares_value_;
 
     private TextView open_;
     private TextView high_;
@@ -55,7 +53,7 @@ public class SharesViewActivity extends Activity {
             return;
         }
 
-        shares_ = Portfolio.getIstance().getShares().get(index_);
+        shares_ = Portfolio.getInstance().getShares().get(index_);
 
 
         formal_name_ = (TextView) findViewById(R.id.formal_name);
@@ -64,6 +62,9 @@ public class SharesViewActivity extends Activity {
         history_graph_ = (LineGraph) findViewById(R.id.history_graph);
         quote_ = (TextView) findViewById(R.id.quote);
         change_ = (TextView) findViewById(R.id.change);
+
+        shares_num_ = (TextView) findViewById(R.id.shares_num);
+        shares_value_ = (TextView) findViewById(R.id.shares_value);
 
         open_ = (TextView) findViewById(R.id.open);
         high_ = (TextView) findViewById(R.id.high);
@@ -92,6 +93,9 @@ public class SharesViewActivity extends Activity {
         }
         change_.setTextColor(StockPortfolio.context.getResources().getColor(color));
 
+        shares_num_.setText("" + shares_.get_quantity());
+        shares_value_.setText("" + shares_.get_own_quotes_value());
+
         open_.setText(String.format("%.2f", Float.valueOf(shares_.get_open())));
         high_.setText(shares_.get_high());
         low_.setText(shares_.get_low());
@@ -101,6 +105,10 @@ public class SharesViewActivity extends Activity {
     }
 
     public void loadHistory() {
+        if (shares_.hasHistory()) {
+            populateGraph();
+        }
+
         Thread history_thread = new Thread(new WebServiceCallRunnable(new Handler()) {
             @Override
             public void run() {
@@ -109,19 +117,23 @@ public class SharesViewActivity extends Activity {
                 handler_.post(new Runnable() {
                     @Override
                     public void run() {
-                        history_graph_.addLine(shares_.get_line());
-                        shares_.get_line().setShowingPoints(false);
-                        shares_.get_line().setColor(Color.parseColor("#FFBB33"));
-                        history_graph_.setRangeY(shares_.get_range_min(), shares_.get_range_max());
-                        history_graph_.setLineToFill(0);
-
-                        progress_bar_.setVisibility(View.GONE);
-                        history_graph_.setVisibility(View.VISIBLE);
+                        populateGraph();
                     }
                 });
             }
         });
         history_thread.start();
+    }
+
+    public void populateGraph() {
+        history_graph_.addLine(shares_.get_line());
+        shares_.get_line().setShowingPoints(false);
+        shares_.get_line().setColor(Color.parseColor("#FFBB33"));
+        history_graph_.setRangeY(shares_.get_range_min(), shares_.get_range_max());
+        history_graph_.setLineToFill(0);
+
+        progress_bar_.setVisibility(View.GONE);
+        history_graph_.setVisibility(View.VISIBLE);
     }
 
     @Override

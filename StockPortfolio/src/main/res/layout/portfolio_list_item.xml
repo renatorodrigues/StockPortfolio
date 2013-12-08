@@ -15,16 +15,37 @@
 
         <TextView
             android:id="@+id/title"
-            android:textSize="20sp"
-            android:fontFamily="sans-serif-light"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Portfolio" />
+            android:text="Portfolio"
+            style="@style/TitleLight" />
 
-        <com.echo.holographlibrary.LineGraph
-            android:id="@+id/graph"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp" />
+            android:layout_height="200dp">
+
+            <com.echo.holographlibrary.LineGraph
+                android:id="@+id/graph"
+                android:layout_width="match_parent"
+                android:layout_height="200dp" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/total_quotes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+
 
     </LinearLayout>
 

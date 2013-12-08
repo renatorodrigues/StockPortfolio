@@ -9,14 +9,22 @@ public class GlobalStock {
     private Line line_graph_;
     private double range_max_;
     private double range_min_;
+    private double total_own_quotes_;
 
     GlobalStock(){
         line_graph_ = new Line();
     }
 
+    public boolean hasHistory() {
+        return (line_graph_.getSize() != 0);
+    }
+
     public void refresh(ArrayList<StockData> companies){
+        total_own_quotes_ = 0.0;
+
         for(StockData company : companies){
             company.refresh_history();
+            total_own_quotes_ += company.get_own_quotes_value();
         }
 
         range_max_=0;
@@ -57,4 +65,8 @@ public class GlobalStock {
     }
 
     public Line get_line() { return line_graph_; }
+
+    public double getOwnedStock() {
+        return total_own_quotes_;
+    }
 }

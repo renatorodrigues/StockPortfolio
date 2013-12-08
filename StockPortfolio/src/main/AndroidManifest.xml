@@ -27,8 +27,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="edu.feup.stockportfolio.ui.AddSharesActivity" />
-        <activity
             android:name=".ui.SharesViewActivity"
             android:label="@string/title_activity_view_shares" >
         </activity>

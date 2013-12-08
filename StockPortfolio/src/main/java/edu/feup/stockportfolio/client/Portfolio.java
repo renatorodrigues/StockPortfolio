@@ -7,14 +7,17 @@ import java.util.ArrayList;
 public class Portfolio {
     private static final Portfolio INSTANCE = new Portfolio();
 
-    public static Portfolio getIstance() {
+    public static Portfolio getInstance() {
         return INSTANCE;
     }
 
+    private GlobalStock global_stock_;
     private ArrayList<StockData> shares_;
 
 
     private Portfolio() {
+        global_stock_ = new GlobalStock();
+
         shares_ = new ArrayList<StockData>();
 
         shares_.add(new StockData("GOOG", 2));
@@ -25,6 +28,10 @@ public class Portfolio {
 
     public ArrayList<StockData> getShares() {
         return shares_;
+    }
+
+    public GlobalStock getGlobalStock() {
+        return global_stock_;
     }
 
     public void addShares(String company, int shares) {

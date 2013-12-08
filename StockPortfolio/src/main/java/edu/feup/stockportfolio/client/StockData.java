@@ -32,6 +32,10 @@ public class StockData{
         line_graph_ = new Line();
     }
 
+    public boolean hasHistory() {
+        return (line_graph_.getSize() != 0);
+    }
+
     public void refresh_today() {
         try {
             StockNetworkUtilities.refresh_today(this);

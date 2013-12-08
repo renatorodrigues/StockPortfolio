@@ -12,13 +12,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.echo.holographlibrary.Line;
 import com.echo.holographlibrary.LineGraph;
@@ -26,6 +24,7 @@ import com.echo.holographlibrary.LinePoint;
 
 import java.util.ArrayList;
 
+import edu.feup.stockportfolio.client.GlobalStock;
 import edu.feup.stockportfolio.client.Portfolio;
 import edu.feup.stockportfolio.R;
 import edu.feup.stockportfolio.client.StockData;
@@ -35,6 +34,7 @@ import edu.feup.stockportfolio.network.WebServiceCallRunnable;
 public class PortfolioActivity extends ListActivity implements AdapterView.OnItemClickListener, SwipeDismissListViewTouchListener.DismissCallbacks {
     private static final String TAG = "PortfolioActivity";
 
+    private GlobalStock global_stock_;
     private ArrayList<StockData> shares_;
     private QuoteListAdapter list_adapter_;
 
@@ -49,7 +49,8 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
         progress_bar_ = (ProgressBar) findViewById(R.id.progress_bar);
         empty_view_ = findViewById(android.R.id.empty);
 
-        shares_ = Portfolio.getIstance().getShares();
+        global_stock_ = Portfolio.getInstance().getGlobalStock();
+        shares_ = Portfolio.getInstance().getShares();
 
         SwipeDismissListViewTouchListener touch_listener = new SwipeDismissListViewTouchListener(getListView(), this);
 
@@ -98,7 +99,7 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
     @Override
     public void onDismiss(ListView list_view, int[] reverse_sorted_positions) {
         for (int position : reverse_sorted_positions) {
-            Portfolio.getIstance().getShares().remove(position - 1);
+            Portfolio.getInstance().getShares().remove(position - 1);
         }
         list_adapter_.notifyDataSetChanged();
     }
@@ -191,21 +192,31 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
                 }
                 holder.change.setTextColor(StockPortfolio.context.getResources().getColor(color));
             } else {
-                Line l = new Line();
-                LinePoint p = new LinePoint(0, 5);
-                l.addPoint(p);
-                p = new LinePoint(8, 8);
-                l.addPoint(p);
-                p = new LinePoint(10, 4);
-                l.addPoint(p);
-                l.setColor(Color.parseColor("#FFBB33"));
-
-                LineGraph li = (LineGraph) convert_view.findViewById(R.id.graph);
-                li.addLine(l);
-                li.setRangeY(0, 10);
-                li.setLineToFill(0);
+                final GlobalStock global_stock = Portfolio.getInstance().getGlobalStock();
+                if (global_stock.hasHistory()) {
+                    global_stock.get_line().setShowingPoints(false);
+                    global_stock.get_line().setColor(Color.parseColor("#FFBB33"));
+                    LineGraph li = (LineGraph) convert_view.findViewById(R.id.graph);
+                    li.addLine(global_stock.get_line());
+                    li.setRangeY(global_stock.get_range_min(), global_stock.get_range_max());
+                    li.setLineToFill(0);
+                } else {
+                    Thread refresh_global = new Thread(new WebServiceCallRunnable(new Handler()) {
+                        @Override
+                        public void run() {
+                            Log.d(TAG, "getting global chart");
+                            global_stock.refresh(shares_);
+                            handler_.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    notifyDataSetChanged();
+                                }
+                            });
+                        }
+                    });
+                    refresh_global.start();
+                }
             }
-
 
             return convert_view;
         }
@@ -228,7 +239,7 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_shares:
-                startActivity(new Intent(PortfolioActivity.this, AddSharesActivity.class));
+                AddStockDialogFragment.newInstance().show(getFragmentManager(), "add_stock");
                 break;
             default:
                 return super.onOptionsItemSelected(item);
