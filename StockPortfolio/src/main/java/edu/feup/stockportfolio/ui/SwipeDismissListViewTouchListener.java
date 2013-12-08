@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package edu.feup.stockportfolio;
+package edu.feup.stockportfolio.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

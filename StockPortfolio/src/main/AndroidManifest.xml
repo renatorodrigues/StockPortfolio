@@ -8,6 +8,8 @@
         android:minSdkVersion="17"
         android:targetSdkVersion="17" />
 
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -26,7 +28,7 @@
         <activity
             android:name="edu.feup.stockportfolio.ui.AddSharesActivity" />
         <activity
-            android:name="edu.feup.stockportfolio.ui.ViewSharesActivity"
+            android:name=".ui.SharesViewActivity"
             android:label="@string/title_activity_view_shares" >
         </activity>
     </application>

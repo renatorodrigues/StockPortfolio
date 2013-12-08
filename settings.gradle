@@ -1,1 +1,1 @@
-include ':StockPortfolio'
+include ':StockPortfolio', ':HoloGraphLibrary'

@@ -14,9 +14,9 @@
         android:layout_height="wrap_content"
         android:text="Portfolio" />
 
-    <TextView
-        android:text="bla bla"
+    <com.echo.holographlibrary.LineGraph
+        android:id="@+id/graph"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="100dp" />
 
 </LinearLayout>

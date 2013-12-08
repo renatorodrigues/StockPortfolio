@@ -25,4 +25,11 @@
         android:gravity="center"
         android:text="No data" />
 
+    <ViewStub
+        android:id="@+id/progress_stub"
+        android:inflatedId="@+id/progress_overlay"
+        android:layout="@layout/progress_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>

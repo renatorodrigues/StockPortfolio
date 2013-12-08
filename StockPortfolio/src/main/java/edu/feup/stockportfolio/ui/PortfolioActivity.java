@@ -3,50 +3,81 @@ package edu.feup.stockportfolio.ui;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.echo.holographlibrary.Line;
+import com.echo.holographlibrary.LineGraph;
+import com.echo.holographlibrary.LinePoint;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import edu.feup.stockportfolio.Portfolio;
+import edu.feup.stockportfolio.client.Portfolio;
 import edu.feup.stockportfolio.R;
-import edu.feup.stockportfolio.SwipeDismissListViewTouchListener;
+import edu.feup.stockportfolio.client.StockData;
+import edu.feup.stockportfolio.network.StockNetworkUtilities;
+import edu.feup.stockportfolio.network.WebServiceCallRunnable;
 
 public class PortfolioActivity extends ListActivity implements AdapterView.OnItemClickListener, SwipeDismissListViewTouchListener.DismissCallbacks {
     private static final String TAG = "PortfolioActivity";
 
-    QuoteListAdapter list_adapter_;
+    private ArrayList<StockData> shares_;
+    private QuoteListAdapter list_adapter_;
 
-    // temp
-    ArrayList<String> quotes_ = new ArrayList<String>(Arrays.asList(Portfolio.Companies));
+    private View progress_overlay_;
 
     @Override
     protected void onCreate(Bundle saved_instance_state) {
         super.onCreate(saved_instance_state);
         setContentView(R.layout.portfolio);
 
-        list_adapter_ = new QuoteListAdapter(this, quotes_);
-        setListAdapter(list_adapter_);
+        shares_ = Portfolio.getIstance().getShares();
 
         SwipeDismissListViewTouchListener touch_listener = new SwipeDismissListViewTouchListener(getListView(), this);
 
         getListView().setOnTouchListener(touch_listener);
         getListView().setOnScrollListener(touch_listener.makeScrollListener());
         getListView().setOnItemClickListener(this);
+
+        //progress_overlay_ = ((ViewStub) findViewById(R.id.progress_stub)).inflate();
+        //progress_overlay_.setVisibility(View.INVISIBLE);
+
+        refreshShares();
     }
 
-    public void loadQuotes() {
+    public void refreshShares() {
+        //progress_overlay_.setVisibility(View.VISIBLE);
 
+        Thread refresh_shares_thread = new Thread(new WebServiceCallRunnable(new Handler()) {
+            @Override
+            public void run() {
+                StockNetworkUtilities.refresh_all_today(shares_);
+
+                handler_.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //progress_overlay_.setVisibility(View.INVISIBLE);
+                        list_adapter_ = new QuoteListAdapter(PortfolioActivity.this, shares_);
+                        setListAdapter(list_adapter_);
+                    }
+                });
+            }
+        });
+        refresh_shares_thread.start();
     }
 
     @Override
@@ -61,26 +92,31 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
     @Override
     public void onDismiss(ListView list_view, int[] reverse_sorted_positions) {
         for (int position : reverse_sorted_positions) {
-            quotes_.remove(position);
+            Portfolio.getIstance().getShares().remove(position - 1);
         }
         list_adapter_.notifyDataSetChanged();
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(this, "" + position, Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(PortfolioActivity.this, ViewSharesActivity.class));
+        if (position == 0) {
+
+        } else {
+            Toast.makeText(this, "" + (position - 1), Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(PortfolioActivity.this, SharesViewActivity.class));
+        }
+
     }
 
     private static class QuoteListAdapter extends BaseAdapter {
         private static final int TYPE_PORTFOLIO = 0;
         private static final int TYPE_QUOTE = 1;
 
-        private ArrayList<String> quotes_ = new ArrayList<String>();
+        private ArrayList<StockData> shares_ = new ArrayList<StockData>();
         private LayoutInflater inflater_;
 
-        public QuoteListAdapter(Context context, ArrayList<String> quotes) {
-            quotes_ = quotes;
+        public QuoteListAdapter(Context context, ArrayList<StockData> shares) {
+            shares_ = shares;
             inflater_ = LayoutInflater.from(context);
         }
 
@@ -96,12 +132,12 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
 
         @Override
         public int getCount() {
-            return quotes_.size();
+            return shares_.size() + 1;
         }
 
         @Override
         public Object getItem(int position) {
-            return quotes_.get(position);
+            return shares_.get(position);
         }
 
         @Override
@@ -130,8 +166,26 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
                 holder = (ViewHolder) convert_view.getTag();
             }
 
-            String quote = quotes_.get(position);
-            holder.quote.setText(quote);
+            if (type == TYPE_QUOTE) {
+                StockData stock_data = shares_.get(position - 1);
+                holder.quote.setText(stock_data.get_company());
+
+            } else {
+                Line l = new Line();
+                LinePoint p = new LinePoint(0, 5);
+                l.addPoint(p);
+                p = new LinePoint(8, 8);
+                l.addPoint(p);
+                p = new LinePoint(10, 4);
+                l.addPoint(p);
+                l.setColor(Color.parseColor("#FFBB33"));
+
+                LineGraph li = (LineGraph) convert_view.findViewById(R.id.graph);
+                li.addLine(l);
+                li.setRangeY(0, 10);
+                li.setLineToFill(0);
+            }
+
 
             return convert_view;
         }
