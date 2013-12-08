@@ -16,6 +16,7 @@ import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +25,6 @@ import com.echo.holographlibrary.LineGraph;
 import com.echo.holographlibrary.LinePoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import edu.feup.stockportfolio.client.Portfolio;
 import edu.feup.stockportfolio.R;
@@ -38,12 +38,16 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
     private ArrayList<StockData> shares_;
     private QuoteListAdapter list_adapter_;
 
-    private View progress_overlay_;
+    private ProgressBar progress_bar_;
+    private View empty_view_;
 
     @Override
     protected void onCreate(Bundle saved_instance_state) {
         super.onCreate(saved_instance_state);
         setContentView(R.layout.portfolio);
+
+        progress_bar_ = (ProgressBar) findViewById(R.id.progress_bar);
+        empty_view_ = findViewById(android.R.id.empty);
 
         shares_ = Portfolio.getIstance().getShares();
 
@@ -53,14 +57,18 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
         getListView().setOnScrollListener(touch_listener.makeScrollListener());
         getListView().setOnItemClickListener(this);
 
-        //progress_overlay_ = ((ViewStub) findViewById(R.id.progress_stub)).inflate();
-        //progress_overlay_.setVisibility(View.INVISIBLE);
-
         refreshShares();
     }
 
     public void refreshShares() {
-        //progress_overlay_.setVisibility(View.VISIBLE);
+        if (shares_.isEmpty()) {
+            Log.v(TAG, "no shares");
+            return;
+        }
+
+        empty_view_.setVisibility(View.GONE);
+        progress_bar_.setVisibility(View.VISIBLE);
+        getListView().setEmptyView(progress_bar_);
 
         Thread refresh_shares_thread = new Thread(new WebServiceCallRunnable(new Handler()) {
             @Override
@@ -70,7 +78,9 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
                 handler_.post(new Runnable() {
                     @Override
                     public void run() {
-                        //progress_overlay_.setVisibility(View.INVISIBLE);
+                        empty_view_.setVisibility(View.VISIBLE);
+                        progress_bar_.setVisibility(View.GONE);
+                        getListView().setEmptyView(empty_view_);
                         list_adapter_ = new QuoteListAdapter(PortfolioActivity.this, shares_);
                         setListAdapter(list_adapter_);
                     }
