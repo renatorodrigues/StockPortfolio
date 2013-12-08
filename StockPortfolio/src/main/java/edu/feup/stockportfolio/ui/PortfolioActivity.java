@@ -200,6 +200,9 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
                     li.addLine(global_stock.get_line());
                     li.setRangeY(global_stock.get_range_min(), global_stock.get_range_max());
                     li.setLineToFill(0);
+
+                    TextView total_quotes = (TextView) convert_view.findViewById(R.id.total_quotes);
+                    total_quotes.setText(global_stock.getOwnedStock());
                 } else {
                     Thread refresh_global = new Thread(new WebServiceCallRunnable(new Handler()) {
                         @Override

@@ -71,6 +71,16 @@ public class Line {
 		}
 		return null;
 	}
+
+    public LinePoint getPointByX(float x){
+        LinePoint p;
+        for(int i = 0; i < points.size(); i++){
+            p = points.get(i);
+            if(p.getX() == x)
+                return p;
+        }
+        return null;
+    }
 	public int getSize(){
 		return points.size();
 	}
