@@ -21,6 +21,9 @@ public class StockData{
     private String market_cap_;
     private int quantity_;
 
+    private double range_max_;
+    private double range_min_;
+
     StockData(String company, int quantity){
         set_company(company);
         set_quantity(quantity);
@@ -53,6 +56,9 @@ public class StockData{
         //first line is the header, data beings on the second!
         Line l = new Line();
 
+        range_max_=0;
+        range_min_=Double.MAX_VALUE;
+
         int c=0;
         for(int i=data.length-1; i>0; --i, ++c){
 
@@ -62,6 +68,9 @@ public class StockData{
             double x = c;
             double y = Double.valueOf(split[4]);
 
+            if(y>range_max_) range_max_=y;
+            if(y<range_min_) range_min_=y;
+
             LinePoint p = new LinePoint(x,y);
             l.addPoint(p);
         }
@@ -69,6 +78,14 @@ public class StockData{
         //add today to graph
         LinePoint p = new LinePoint(c,get_actual_quote());
         l.addPoint(p);
+        if(get_actual_quote()>range_max_) range_max_=get_actual_quote();
+        if(get_actual_quote()<range_min_) range_min_=get_actual_quote();
+
+        double delta = range_max_-range_min_;
+        double padding = delta*0.1;
+        range_min_ -= delta;
+        range_max_ += delta;
+        if(range_min_<0)range_min_=0;
 
         line_graph_ = l;
     }
@@ -150,5 +167,13 @@ public class StockData{
                 + get_volume() + "\n"
                 + get_avg_volume() + "\n"
                 + get_market_cap();
+    }
+
+    public float get_range_max() {
+        return (float)range_max_;
+    }
+
+    public float get_range_min() {
+        return (float)range_min_;
     }
 }
