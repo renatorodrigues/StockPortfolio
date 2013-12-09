@@ -4,6 +4,8 @@ import android.util.Log;
 
 import com.echo.holographlibrary.Line;
 import com.echo.holographlibrary.LinePoint;
+import com.echo.holographlibrary.PieGraph;
+import com.echo.holographlibrary.PieSlice;
 
 import java.util.ArrayList;
 
@@ -11,6 +13,8 @@ public class GlobalStock {
     private static final String TAG = "GlobalStock";
 
     private Line line_graph_;
+    private ArrayList<PieSlice> slice_quantity_;
+    private ArrayList<PieSlice> slice_prices_;
     private double range_max_;
     private double range_min_;
     private double total_own_quotes_ = 0.0;
@@ -19,6 +23,8 @@ public class GlobalStock {
 
     GlobalStock(){
         line_graph_ = new Line();
+        slice_quantity_ = new ArrayList<PieSlice>();
+        slice_prices_ = new ArrayList<PieSlice>();
     }
 
     public boolean hasHistory() {
@@ -34,9 +40,24 @@ public class GlobalStock {
         Log.d(TAG, "refresh");
         total_own_quotes_ = 0.0;
 
+        slice_quantity_ = new ArrayList<PieSlice>();
+        slice_prices_ = new ArrayList<PieSlice>();
+
         for (StockData company : companies){
-            company.refresh_history();
+            if(!company.hasHistory())
+                company.refresh_history();
+
             total_own_quotes_ += company.get_own_quotes_value();
+
+            PieSlice pq = new PieSlice();
+            pq.setTitle(company.get_formal_name());
+            pq.setValue(company.get_quantity());
+            slice_quantity_.add(pq);
+
+            PieSlice pp = new PieSlice();
+            pp.setTitle(company.get_formal_name());
+            pp.setValue((float)company.get_own_quotes_value());
+            slice_prices_.add(pp);
         }
 
         range_max_ = 0;
@@ -68,6 +89,7 @@ public class GlobalStock {
         }
 
         line_graph_ = l;
+
         has_history_ = true;
         refreshing_ = false;
     }
@@ -82,6 +104,14 @@ public class GlobalStock {
 
     public Line get_line() {
         return line_graph_;
+    }
+
+    public ArrayList<PieSlice> get_slices_quantities(){
+        return slice_quantity_;
+    }
+
+    public ArrayList<PieSlice> get_slices_prices(){
+        return slice_prices_;
     }
 
     public double getOwnedStock() {
