@@ -19,10 +19,9 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.echo.holographlibrary.Line;
 import com.echo.holographlibrary.LineGraph;
-import com.echo.holographlibrary.LinePoint;
 
 import java.util.ArrayList;
 
@@ -34,74 +33,99 @@ import edu.feup.stockportfolio.network.NetworkUtilities;
 import edu.feup.stockportfolio.network.StockNetworkUtilities;
 import edu.feup.stockportfolio.network.WebServiceCallRunnable;
 
-public class PortfolioActivity extends ListActivity implements AdapterView.OnItemClickListener, SwipeDismissListViewTouchListener.DismissCallbacks {
+public class PortfolioActivity extends ListActivity
+        implements AdapterView.OnItemClickListener, SwipeDismissListViewTouchListener.DismissCallbacks, AddStockDialogFragment.AddStockDialogFragmentListener {
     private static final String TAG = "PortfolioActivity";
 
+    private Portfolio portfolio_;
+
     private GlobalStock global_stock_;
-    private ArrayList<StockData> shares_;
+    private ArrayList<StockData> stocks_;
     private QuoteListAdapter list_adapter_;
 
+    private ListView list_view_;
     private ProgressBar progress_bar_;
     private View empty_view_;
     private ViewStub no_connection_stub_;
     private View no_connection_;
+
+    private AddStockDialogFragment add_stock_fragment_ = null;
 
     @Override
     protected void onCreate(Bundle saved_instance_state) {
         super.onCreate(saved_instance_state);
         setContentView(R.layout.portfolio);
 
+        portfolio_ = Portfolio.getInstance();
+        global_stock_ = portfolio_.getGlobalStock();
+        stocks_ = portfolio_.getStocks();
+
+        list_view_ = getListView();
         progress_bar_ = (ProgressBar) findViewById(R.id.progress_bar);
         empty_view_ = findViewById(android.R.id.empty);
 
-        global_stock_ = Portfolio.getInstance().getGlobalStock();
-        shares_ = Portfolio.getInstance().getShares();
-
         SwipeDismissListViewTouchListener touch_listener = new SwipeDismissListViewTouchListener(getListView(), this);
 
-        getListView().setOnTouchListener(touch_listener);
-        getListView().setOnScrollListener(touch_listener.makeScrollListener());
-        getListView().setOnItemClickListener(this);
+        list_view_.setOnTouchListener(touch_listener);
+        list_view_.setOnScrollListener(touch_listener.makeScrollListener());
+        list_view_.setOnItemClickListener(this);
 
-        refreshShares();
+        refreshStocksToday();
     }
 
     public void noConnection(View v) {
         startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
     }
 
-    public void refreshShares() {
-        if (shares_.isEmpty()) {
-            Log.v(TAG, "no shares");
-            return;
-        }
+    public void refreshStocksHistory() {
+        Thread refresh_global = new Thread(new WebServiceCallRunnable(new Handler()) {
+            @Override
+            public void run() {
+                Log.d(TAG, "Refreshing stocks history");
+                global_stock_.refresh(stocks_);
+                handler_.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        list_adapter_.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+        refresh_global.start();
+    }
 
-        getListView().getEmptyView().setVisibility(View.GONE);
-
+    public void refreshStocksToday() {
         if (!NetworkUtilities.isNetworkAvailable()) {
+            list_view_.getEmptyView().setVisibility(View.GONE);
             no_connection_stub_ = (ViewStub) findViewById(R.id.no_connection_stub);
             no_connection_ = no_connection_stub_.inflate();
-            getListView().setEmptyView(no_connection_);
+            list_view_.setEmptyView(no_connection_);
             NetworkUtilities.showNoConnectionDialog(PortfolioActivity.this);
             return;
         }
 
-        //empty_view_.setVisibility(View.GONE);
-        progress_bar_.setVisibility(View.VISIBLE);
-        getListView().setEmptyView(progress_bar_);
+        if (stocks_.isEmpty()) {
+            Log.v(TAG, "no shares");
+            return;
+        }
+
+        list_view_.getEmptyView().setVisibility(View.GONE);
+
+        //progress_bar_.setVisibility(View.VISIBLE);
+        list_view_.setEmptyView(progress_bar_);
 
         Thread refresh_shares_thread = new Thread(new WebServiceCallRunnable(new Handler()) {
             @Override
             public void run() {
-                StockNetworkUtilities.refresh_all_today(shares_);
+                StockNetworkUtilities.refresh_all_today(stocks_);
 
                 handler_.post(new Runnable() {
                     @Override
                     public void run() {
                         empty_view_.setVisibility(View.VISIBLE);
                         progress_bar_.setVisibility(View.GONE);
-                        getListView().setEmptyView(empty_view_);
-                        list_adapter_ = new QuoteListAdapter(PortfolioActivity.this, shares_);
+                        list_view_.setEmptyView(empty_view_);
+                        list_adapter_ = new QuoteListAdapter(PortfolioActivity.this, stocks_);
                         setListAdapter(list_adapter_);
                     }
                 });
@@ -118,9 +142,20 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
     @Override
     public void onDismiss(ListView list_view, int[] reverse_sorted_positions) {
         for (int position : reverse_sorted_positions) {
-            Portfolio.getInstance().getShares().remove(position - 1);
+            portfolio_.removeStock(position - 1);
         }
-        list_adapter_.notifyDataSetChanged();
+
+        if (stocks_.isEmpty()) {
+            list_view.setAdapter(null);
+            list_adapter_ = null;
+        } else {
+            refreshStocksHistory();
+        }
+    }
+
+    public void addStock(View v) {
+        add_stock_fragment_ = AddStockDialogFragment.newInstance();
+        add_stock_fragment_.show(getFragmentManager(), "add_stock");
     }
 
     @Override
@@ -133,6 +168,44 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
             startActivity(intent);
         }
 
+    }
+
+    @Override
+    public void onStockAdded(final String tick, final int shares) {
+        Thread new_stock_thread = new Thread(new WebServiceCallRunnable(new Handler()) {
+            @Override
+            public void run() {
+                final StockData stock = StockNetworkUtilities.new_stock(tick, shares);
+                if (stock != null) {
+                    portfolio_.addStock(stock);
+                }
+
+                handler_.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (stock != null) {
+                            if (list_adapter_ == null) {
+                                list_view_.setEmptyView(empty_view_);
+                                list_adapter_ = new QuoteListAdapter(PortfolioActivity.this, stocks_);
+                                setListAdapter(list_adapter_);
+                            } else {
+                                list_adapter_.notifyDataSetChanged();
+                            }
+
+                            if (add_stock_fragment_ != null) {
+                                add_stock_fragment_.dismiss();
+                                add_stock_fragment_ = null;
+                            }
+
+                            refreshStocksHistory();
+                        } else {
+                            Toast.makeText(PortfolioActivity.this, "Company not found", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
+        new_stock_thread.start();
     }
 
     private static class QuoteListAdapter extends BaseAdapter {
@@ -213,37 +286,26 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
             } else {
                 final GlobalStock global_stock = Portfolio.getInstance().getGlobalStock();
                 final ProgressBar progress_bar = (ProgressBar) convert_view.findViewById(R.id.progress_bar);
-                final LineGraph global_graph = (LineGraph) convert_view.findViewById(R.id.graph);;
-                if (global_stock.hasHistory()) {
+                final LineGraph global_graph = (LineGraph) convert_view.findViewById(R.id.graph);
+                final View portfolio_value = convert_view.findViewById(R.id.portfolio_value);
+                final TextView total_quotes = (TextView) convert_view.findViewById(R.id.total_quotes);
+                if (!global_stock.isRefreshing() && global_stock.hasHistory()) {
                     progress_bar.setVisibility(View.GONE);
 
                     global_stock.get_line().setShowingPoints(false);
                     global_stock.get_line().setColor(Color.parseColor("#FFBB33"));
+                    global_graph.removeAllLines();
                     global_graph.addLine(global_stock.get_line());
                     global_graph.setRangeY(global_stock.get_range_min(), global_stock.get_range_max());
                     global_graph.setLineToFill(0);
 
                     global_graph.setVisibility(View.VISIBLE);
-
-                    TextView total_quotes = (TextView) convert_view.findViewById(R.id.total_quotes);
-                    total_quotes.setText("" + global_stock.getOwnedStock());
+                    portfolio_value.setVisibility(View.VISIBLE);
+                    total_quotes.setText(String.format("%.2f",global_stock.getOwnedStock()));
                 } else {
                     progress_bar.setVisibility(View.VISIBLE);
                     global_graph.setVisibility(View.GONE);
-                    Thread refresh_global = new Thread(new WebServiceCallRunnable(new Handler()) {
-                        @Override
-                        public void run() {
-                            Log.d(TAG, "getting global chart");
-                            global_stock.refresh(shares_);
-                            handler_.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    notifyDataSetChanged();
-                                }
-                            });
-                        }
-                    });
-                    refresh_global.start();
+                    portfolio_value.setVisibility(View.INVISIBLE);
                 }
             }
 
@@ -268,7 +330,7 @@ public class PortfolioActivity extends ListActivity implements AdapterView.OnIte
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_shares:
-                AddStockDialogFragment.newInstance().show(getFragmentManager(), "add_stock");
+                addStock(null);
                 break;
             default:
                 return super.onOptionsItemSelected(item);

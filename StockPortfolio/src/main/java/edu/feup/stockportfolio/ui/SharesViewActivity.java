@@ -53,7 +53,7 @@ public class SharesViewActivity extends Activity {
             return;
         }
 
-        shares_ = Portfolio.getInstance().getShares().get(index_);
+        shares_ = Portfolio.getInstance().getStocks().get(index_);
 
 
         formal_name_ = (TextView) findViewById(R.id.formal_name);
@@ -96,7 +96,7 @@ public class SharesViewActivity extends Activity {
         shares_num_.setText("" + shares_.get_quantity());
         shares_value_.setText("" + shares_.get_own_quotes_value());
 
-        open_.setText(String.format("%.2f", Float.valueOf(shares_.get_open())));
+        open_.setText(shares_.get_open());
         high_.setText(shares_.get_high());
         low_.setText(shares_.get_low());
         volume_.setText(shares_.get_volume());

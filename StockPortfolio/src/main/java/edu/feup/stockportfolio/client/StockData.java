@@ -1,11 +1,14 @@
 package edu.feup.stockportfolio.client;
 
+import android.util.Log;
+
 import com.echo.holographlibrary.Line;
 import com.echo.holographlibrary.LinePoint;
 
 import edu.feup.stockportfolio.network.StockNetworkUtilities;
 
-public class StockData{
+public class StockData {
+    private static final String TAG = "StockData";
 
     private Line line_graph_;
     private String company_;
@@ -134,7 +137,7 @@ public class StockData{
     }
 
     public double get_own_quotes_value(){
-        return get_actual_quote()*get_quantity();
+        return get_actual_quote() * get_quantity();
     }
 
     public Line get_line() { return line_graph_; }
@@ -165,20 +168,24 @@ public class StockData{
         return change_percentage_;
     }
 
+    private String formatFloat(String str) {
+        return "N/A".equals(str) ? "N/A" : String.format("%.2f", Float.valueOf(str));
+    }
+
     public String get_open() {
-        return open_;
+        return formatFloat(open_);
     }
 
     public String get_high() {
-        return high_;
+        return formatFloat(high_);
     }
 
     public String get_low() {
-        return low_;
+        return formatFloat(low_);
     }
 
     public String get_volume() {
-        return volume_;
+        return formatFloat(volume_);
     }
 
     public String get_avg_volume() {

@@ -12,21 +12,26 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add stock"
+        android:text="@string/add_stock"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         style="@style/TitleLight"/>
 
-    <EditText
+    <edu.feup.stockportfolio.ui.InstantAutoCompleteTextView
         android:id="@+id/tick"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tick" />
+        android:hint="@string/tick"
+        android:inputType="text"
+        android:nextFocusDown="@+id/shares"
+        android:imeOptions="actionNext"/>
 
     <EditText
         android:id="@+id/shares"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Shares" />
+        android:hint="@string/shares"
+        android:inputType="number"
+        android:imeOptions="actionDone"/>
 
     <Button
         android:id="@+id/confirm_button"
@@ -34,6 +39,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="Add to portfolio" />
+        android:text="@string/add_to_portfolio" />
 
 </LinearLayout>

@@ -12,13 +12,13 @@
             android:textStyle="bold"
             android:textAllCaps="true"
             android:gravity="center"
-            android:text="No connection" />
+            android:text="@string/no_connection" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/add_share"
-            android:text="Enable mobile network or Wi-Fi"
+            android:text="@string/enable_mobile_or_wifi"
             android:gravity="center"
             android:clickable="true"
             android:padding="5dp"

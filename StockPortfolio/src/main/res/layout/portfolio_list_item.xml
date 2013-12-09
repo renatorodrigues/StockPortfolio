@@ -39,14 +39,28 @@
 
         </FrameLayout>
 
-        <TextView
-            android:id="@+id/total_quotes"
+        <LinearLayout
+            android:id="@+id/portfolio_value"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:text="Current value:"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-light" />
 
+            <TextView
+                android:id="@+id/total_quotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

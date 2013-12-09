@@ -1,9 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">StockPortfolio</string>
+    <string name="app_name">Stock Portfolio</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_view_shares">Shares</string>
+    <string name="add_stock">Add stock</string>
+    <string name="tick">Tick</string>
+    <string name="shares">Shares</string>
+    <string name="add_to_portfolio">Add to portfolio</string>
+    <string name="no_connection">No connection</string>
+    <string name="enable_mobile_or_wifi">Enable mobile network or Wi-Fi</string>
+    <string name="no_stocks">No stocks</string>
+    <string name="add_a_stock">Add a stock</string>
+
+
+    <string-array name="popular_stocks">
+        <item>AAPL</item>
+        <item>GOOG</item>
+        <item>MSFT</item>
+        <item>TOYOF</item>
+        <item>BPI</item>
+        <item>EDP</item>
+        <item>SON</item>
+        <item>RENE</item>
+        <item>SNC</item>
+        <item>COR</item>
+        <item>EGL</item>
+    </string-array>
 
 </resources>

@@ -1,34 +1,46 @@
 package edu.feup.stockportfolio.client;
 
+import android.util.Log;
+
 import com.echo.holographlibrary.Line;
 import com.echo.holographlibrary.LinePoint;
 
 import java.util.ArrayList;
 
 public class GlobalStock {
+    private static final String TAG = "GlobalStock";
+
     private Line line_graph_;
     private double range_max_;
     private double range_min_;
-    private double total_own_quotes_;
+    private double total_own_quotes_ = 0.0;
+    private boolean has_history_ = false;
+    private boolean refreshing_ = false;
 
     GlobalStock(){
         line_graph_ = new Line();
     }
 
     public boolean hasHistory() {
-        return (line_graph_.getSize() != 0);
+        return has_history_;
     }
 
-    public void refresh(ArrayList<StockData> companies){
+    public boolean isRefreshing() {
+        return refreshing_;
+    }
+
+    public void refresh(ArrayList<StockData> companies) {
+        refreshing_ = true;
+        Log.d(TAG, "refresh");
         total_own_quotes_ = 0.0;
 
-        for(StockData company : companies){
+        for (StockData company : companies){
             company.refresh_history();
             total_own_quotes_ += company.get_own_quotes_value();
         }
 
-        range_max_=0;
-        range_min_=Double.MAX_VALUE;
+        range_max_ = 0;
+        range_min_ = Double.MAX_VALUE;
 
         Line l = new Line();
         for(int i=0; i<31; ++i){
@@ -51,20 +63,26 @@ public class GlobalStock {
         double padding = delta*0.1;
         range_min_ -= padding;
         range_max_ += padding;
-        if(range_min_<0)range_min_=0;
+        if (range_min_ < 0) {
+            range_min_ = 0;
+        }
 
         line_graph_ = l;
+        has_history_ = true;
+        refreshing_ = false;
     }
 
     public float get_range_max() {
-        return (float)range_max_;
+        return (float) range_max_;
     }
 
     public float get_range_min() {
-        return (float)range_min_;
+        return (float) range_min_;
     }
 
-    public Line get_line() { return line_graph_; }
+    public Line get_line() {
+        return line_graph_;
+    }
 
     public double getOwnedStock() {
         return total_own_quotes_;

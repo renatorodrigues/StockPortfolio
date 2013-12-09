@@ -2,6 +2,7 @@ package edu.feup.stockportfolio.client;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class Portfolio {
@@ -12,49 +13,63 @@ public class Portfolio {
     }
 
     private GlobalStock global_stock_;
-    private ArrayList<StockData> shares_;
+    private ArrayList<StockData> stocks_;
 
 
     private Portfolio() {
         global_stock_ = new GlobalStock();
 
-        shares_ = new ArrayList<StockData>();
+        stocks_ = new ArrayList<StockData>();
 
-        shares_.add(new StockData("GOOG", 2));
-        shares_.add(new StockData("IBM", 3));
-        shares_.add(new StockData("MSFT", 1));
-        shares_.add(new StockData("TWTR", 1));
+        /*stocks_.add(new StockData("GOOG", 2));
+        stocks_.add(new StockData("IBM", 3));
+        stocks_.add(new StockData("MSFT", 1));
+        stocks_.add(new StockData("TWTR", 1));*/
     }
 
-    public ArrayList<StockData> getShares() {
-        return shares_;
+    public String[] getCompanies() {
+        String[] companies = new String[stocks_.size()];
+        int i = 0;
+        for (StockData stock : stocks_) {
+            companies[i++] = stock.get_company();
+        }
+
+        return companies;
+    }
+
+    public boolean contains(String company) {
+        return Arrays.asList(getCompanies()).contains(company);
+    }
+
+    public ArrayList<StockData> getStocks() {
+        return stocks_;
     }
 
     public GlobalStock getGlobalStock() {
         return global_stock_;
     }
 
-    public void addShares(String company, int shares) {
-        shares_.add(new StockData(company, shares));
+    public void addStock(StockData stock) {
+        stocks_.add(stock);
     }
 
-    public void removeShares(int index) {
-        shares_.remove(index);
+    public void addStock(String company, int shares) {
+        stocks_.add(new StockData(company, shares));
     }
 
-    public void removeShares(StockData shares) {
-        shares_.remove(shares);
+    public void removeStock(int index) {
+        stocks_.remove(index);
     }
 
-    public int getTotal() {
-        return -1;
+    public void removeStock(StockData stock) {
+        stocks_.remove(stock);
     }
 
-    public void loadShares() {
+    public void loadStocks() {
 
     }
 
-    public void saveShares() {
+    public void saveStocks() {
 
     }
 }

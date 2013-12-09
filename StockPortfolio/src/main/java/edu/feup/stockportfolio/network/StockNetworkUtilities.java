@@ -86,8 +86,8 @@ public class StockNetworkUtilities extends NetworkUtilities{
         company.populate_history(lines," - -"+day);
     }
 
-    public static StockData new_stock(String company){
-        StockData sd = new StockData(company, 0);
+    public static StockData new_stock(String company, int quantity){
+        StockData sd = new StockData(company, quantity);
         try{
             StockNetworkUtilities.refresh_today(sd);
         } catch (Exception e){
