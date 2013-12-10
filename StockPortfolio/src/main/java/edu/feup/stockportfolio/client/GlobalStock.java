@@ -1,5 +1,6 @@
 package edu.feup.stockportfolio.client;
 
+import android.graphics.Color;
 import android.util.Log;
 
 import com.echo.holographlibrary.Line;
@@ -8,6 +9,7 @@ import com.echo.holographlibrary.PieGraph;
 import com.echo.holographlibrary.PieSlice;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GlobalStock {
     private static final String TAG = "GlobalStock";
@@ -59,6 +61,8 @@ public class GlobalStock {
             pp.setValue((float)company.get_own_quotes_value());
             slice_prices_.add(pp);
         }
+        colorize_slices(slice_prices_);
+        colorize_slices(slice_quantity_);
 
         range_max_ = 0;
         range_min_ = Double.MAX_VALUE;
@@ -116,5 +120,30 @@ public class GlobalStock {
 
     public double getOwnedStock() {
         return total_own_quotes_;
+    }
+
+    private void colorize_slices(ArrayList<PieSlice> slices){
+
+        int n = slices.size();
+        if(n==0) return;
+
+        int baseColor = Color.rgb(138, 86, 226);
+
+        float[] baseColorHSV = new float[3];
+        float baseHue;
+        Color.colorToHSV(baseColor, baseColorHSV);
+        baseHue = baseColorHSV[0];
+
+        slices.get(0).setColor(baseColor);
+
+        double step = (240.0 / (double)n);
+
+        for (int i = 1; i < n; ++i)
+        {
+            float[] nextColor = baseColorHSV;
+            nextColor[0] = (float)((baseHue + step * ((double)i)) % 240.0);
+            slices.get(i).setColor(Color.HSVToColor(nextColor));
+        }
+
     }
 }
