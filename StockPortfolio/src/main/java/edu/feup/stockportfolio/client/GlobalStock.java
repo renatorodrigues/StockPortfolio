@@ -127,7 +127,8 @@ public class GlobalStock {
         int n = slices.size();
         if(n==0) return;
 
-        int baseColor = Color.rgb(138, 86, 226);
+        //int baseColor = Color.rgb(138, 86, 226);
+        int baseColor = Color.parseColor("#FFBB33");
 
         float[] baseColorHSV = new float[3];
         float baseHue;
