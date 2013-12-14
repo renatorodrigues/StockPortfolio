@@ -235,6 +235,7 @@ public class PortfolioActivity extends ListActivity
                 }
             } else if (result_code == StockViewActivity.RESULT_STOCK_UPDATED) {
                 list_adapter_.notifyDataSetChanged();
+                refreshStocksHistory();
             }
         }
     }
