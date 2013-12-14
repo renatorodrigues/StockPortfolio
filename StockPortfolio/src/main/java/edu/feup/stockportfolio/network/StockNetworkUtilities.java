@@ -1,5 +1,6 @@
 package edu.feup.stockportfolio.network;
 
+import android.accounts.NetworkErrorException;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -35,12 +36,15 @@ public class StockNetworkUtilities extends NetworkUtilities{
         String uri = BASE_URL_SINGLE + SINGLE_FORMAT_QUERY +"&s=";
         uri += company.get_company();
         String response = get(uri);
+        if (response == null) {
+            throw new NullPointerException();
+        }
         Log.d("REPLY",response);
 
         company.populate_today(response.split("(,)(?=(?:[^\"]|\"[^\"]*\")*$)"));
     }
 
-    public static void refresh_all_today(ArrayList<StockData> companies){
+    public static void refresh_all_today(ArrayList<StockData> companies) {
         String uri = BASE_URL_SINGLE + SINGLE_FORMAT_QUERY +"&s=";
 
         for(StockData company : companies){
@@ -48,6 +52,9 @@ public class StockNetworkUtilities extends NetworkUtilities{
         }
 
         String response = get(uri);
+        if (response == null) {
+            throw new NullPointerException();
+        }
         Log.d("REPLY",response);
         String[] split_data = response.split("\n");
 
@@ -79,11 +86,14 @@ public class StockNetworkUtilities extends NetworkUtilities{
                 month_end+day_end+year_end+periodicity+"&s="+company.get_company();
         Log.d("REPLY",uri);
         String response = get(uri);
+        if (response == null) {
+            throw new NullPointerException();
+        }
         Log.d("REPLY",response);
 
         //FIRST LINE IS HEADER, DATA STARTS ON SECOND LINE!
         String[] lines = response.split("\n");
-        company.populate_history(lines," - -"+day);
+        company.populate_history(lines," - -" + day);
     }
 
     public static StockData new_stock(String company, int quantity){

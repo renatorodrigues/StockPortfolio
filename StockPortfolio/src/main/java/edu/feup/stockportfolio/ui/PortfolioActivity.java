@@ -37,6 +37,8 @@ public class PortfolioActivity extends ListActivity
         implements AdapterView.OnItemClickListener, SwipeDismissListViewTouchListener.DismissCallbacks, AddStockDialogFragment.AddStockDialogFragmentListener {
     private static final String TAG = "PortfolioActivity";
 
+    private static final int REQUEST_VIEW_STOCK = 1;
+
     private Portfolio portfolio_;
 
     private GlobalStock global_stock_;
@@ -57,6 +59,8 @@ public class PortfolioActivity extends ListActivity
         setContentView(R.layout.portfolio);
 
         portfolio_ = Portfolio.getInstance();
+        portfolio_.loadStocks();
+
         global_stock_ = portfolio_.getGlobalStock();
         stocks_ = portfolio_.getStocks();
 
@@ -82,13 +86,33 @@ public class PortfolioActivity extends ListActivity
             @Override
             public void run() {
                 Log.d(TAG, "Refreshing stocks history");
-                global_stock_.refresh(stocks_);
-                handler_.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        list_adapter_.notifyDataSetChanged();
-                    }
-                });
+                boolean error = false;
+                try {
+                    global_stock_.refresh(stocks_);
+                } catch (NullPointerException e) {
+                    error = true;
+                }
+
+                Runnable result;
+                /*if (error) {
+                    handler_.postDelayed(this, 2000);
+                    result = new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(PortfolioActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                        }
+                    };
+                } else {
+                    handler_.removeCallbacks(this);*/
+                    result = new Runnable() {
+                        @Override
+                        public void run() {
+                            list_adapter_.notifyDataSetChanged();
+                        }
+                    };
+                /*}*/
+
+                handler_.post(result);
             }
         });
         refresh_global.start();
@@ -100,7 +124,6 @@ public class PortfolioActivity extends ListActivity
             no_connection_stub_ = (ViewStub) findViewById(R.id.no_connection_stub);
             no_connection_ = no_connection_stub_.inflate();
             list_view_.setEmptyView(no_connection_);
-            NetworkUtilities.showNoConnectionDialog(PortfolioActivity.this);
             return;
         }
 
@@ -117,18 +140,42 @@ public class PortfolioActivity extends ListActivity
         Thread refresh_shares_thread = new Thread(new WebServiceCallRunnable(new Handler()) {
             @Override
             public void run() {
-                StockNetworkUtilities.refresh_all_today(stocks_);
+                boolean error = false;
+                try {
+                    StockNetworkUtilities.refresh_all_today(stocks_);
+                } catch (NullPointerException e) {
+                    error = true;
+                }
 
-                handler_.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        empty_view_.setVisibility(View.VISIBLE);
-                        progress_bar_.setVisibility(View.GONE);
-                        list_view_.setEmptyView(empty_view_);
-                        list_adapter_ = new QuoteListAdapter(PortfolioActivity.this, stocks_);
-                        setListAdapter(list_adapter_);
-                    }
-                });
+                Runnable ui_runnable;
+                if (error) {
+                    ui_runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            list_view_.setAdapter(null);
+                            list_adapter_ = null;
+                            list_view_.getEmptyView().setVisibility(View.GONE);
+                            no_connection_stub_ = (ViewStub) findViewById(R.id.no_connection_stub);
+                            no_connection_ = no_connection_stub_.inflate();
+                            list_view_.setEmptyView(no_connection_);
+                        }
+                    };
+                } else {
+                    ui_runnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            empty_view_.setVisibility(View.VISIBLE);
+                            progress_bar_.setVisibility(View.GONE);
+                            list_view_.setEmptyView(empty_view_);
+                            list_adapter_ = new QuoteListAdapter(PortfolioActivity.this, stocks_);
+                            setListAdapter(list_adapter_);
+
+                            refreshStocksHistory();
+                        }
+                    };
+                }
+
+                handler_.post(ui_runnable);
             }
         });
         refresh_shares_thread.start();
@@ -163,11 +210,33 @@ public class PortfolioActivity extends ListActivity
         if (position == 0) {
 
         } else {
-            Intent intent = new Intent(PortfolioActivity.this, SharesViewActivity.class);
-            intent.putExtra(SharesViewActivity.ARG_INDEX, position - 1);
-            startActivity(intent);
+            Intent intent = new Intent(PortfolioActivity.this, StockViewActivity.class);
+            intent.putExtra(StockViewActivity.ARG_INDEX, position - 1);
+            startActivityForResult(intent, REQUEST_VIEW_STOCK);
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int request_code, int result_code, Intent data) {
+        if (request_code == REQUEST_VIEW_STOCK) {
+            Log.d(TAG, "stock viewed");
+            if (result_code == StockViewActivity.RESULT_STOCK_REMOVED) {
+                int stock_index = data.getIntExtra(StockViewActivity.EXTRA_STOCK_INDEX, -1);
+                if (stock_index != -1) {
+                    portfolio_.removeStock(stock_index);
+
+                    if (stocks_.isEmpty()) {
+                        list_view_.setAdapter(null);
+                        list_adapter_ = null;
+                    } else {
+                        refreshStocksHistory();
+                    }
+                }
+            } else if (result_code == StockViewActivity.RESULT_STOCK_UPDATED) {
+                list_adapter_.notifyDataSetChanged();
+            }
+        }
     }
 
     @Override
@@ -206,6 +275,11 @@ public class PortfolioActivity extends ListActivity
             }
         });
         new_stock_thread.start();
+    }
+
+    public void portfolioDetails(View v) {
+        Intent intent = new Intent(PortfolioActivity.this, PortfolioDetailsActivity.class);
+        startActivity(intent);
     }
 
     private static class QuoteListAdapter extends BaseAdapter {
@@ -256,11 +330,13 @@ public class PortfolioActivity extends ListActivity
                         convert_view = inflater_.inflate(R.layout.portfolio_list_item, null);
                         break;
                     case TYPE_QUOTE:
-                        convert_view = inflater_.inflate(R.layout.quote_list_item, null);
+                        convert_view = inflater_.inflate(R.layout.stock_list_item, null);
                         holder.formal_name = (TextView) convert_view.findViewById(R.id.formal_name);
                         holder.company = (TextView) convert_view.findViewById(R.id.company);
                         holder.quote = (TextView) convert_view.findViewById(R.id.quote);
                         holder.change = (TextView) convert_view.findViewById(R.id.change);
+                        holder.shares_num = (TextView) convert_view.findViewById(R.id.shares_num);
+                        holder.shares_value = (TextView) convert_view.findViewById(R.id.shares_value);
                         break;
                 }
                 convert_view.setTag(holder);
@@ -275,6 +351,8 @@ public class PortfolioActivity extends ListActivity
                 holder.company.setText(stock_data.get_company());
                 holder.quote.setText(stock_data.get_quote_value());
                 holder.change.setText(stock_data.get_change() + " (" + stock_data.get_change_percentage() + ")");
+                holder.shares_num.setText("" + stock_data.get_quantity());
+                holder.shares_value.setText("" + stock_data.get_own_quotes_value());
 
                 int color;
                 if (stock_data.get_change().contains("+")) {
@@ -318,6 +396,8 @@ public class PortfolioActivity extends ListActivity
         public TextView company;
         public TextView quote;
         public TextView change;
+        public TextView shares_num;
+        public TextView shares_value;
     }
 
     @Override

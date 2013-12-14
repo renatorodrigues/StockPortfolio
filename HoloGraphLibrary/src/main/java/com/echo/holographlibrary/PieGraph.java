@@ -33,6 +33,7 @@ import android.graphics.Path;
 import android.graphics.Path.Direction;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.util.AttributeSet;
@@ -50,6 +51,7 @@ public class PieGraph extends View {
 	
 	private int indexSelected = -1;
 	private int thickness = 50;
+
 	private OnSliceClickedListener listener;
 	
 	
@@ -64,14 +66,14 @@ public class PieGraph extends View {
 		canvas.drawColor(Color.TRANSPARENT);
 		paint.reset();
 		paint.setAntiAlias(true);
-		float midX, midY, radius, innerRadius;
+		float midX, midY, radius, innerRadius, label_radius;
 		path.reset();
 		
 		float currentAngle = 270;
 		float currentSweep = 0;
 		int totalValue = 0;
 		float padding = 2;
-		
+
 		midX = getWidth()/2;
 		midY = getHeight()/2;
 		if (midX < midY){
@@ -81,12 +83,17 @@ public class PieGraph extends View {
 		}
 		radius -= padding;
 		innerRadius = radius - thickness;
+        label_radius = radius - thickness / 2;
 		
 		for (PieSlice slice : slices){
 			totalValue += slice.getValue();
 		}
-		
-		int count = 0;
+
+        paint.setTextAlign(Paint.Align.CENTER);
+
+        float density_multiplier = getContext().getResources().getDisplayMetrics().density;
+        paint.setTextSize(16 * density_multiplier);
+        int count = 0;
 		for (PieSlice slice : slices){
 			Path p = new Path();
 			paint.setColor(slice.getColor());
@@ -98,8 +105,15 @@ public class PieGraph extends View {
 			slice.setPath(p);
 			slice.setRegion(new Region((int)(midX-radius), (int)(midY-radius), (int)(midX+radius), (int)(midY+radius)));
 			canvas.drawPath(p, paint);
-			
-			if (indexSelected == count && listener != null){
+
+            float mid_angle = (float) ((currentAngle + currentSweep / 2) * Math.PI / 180);
+            float mid_x = (float) (midX + label_radius * Math.cos(mid_angle));
+            float mid_y = (float) (midY + label_radius * Math.sin(mid_angle));
+            paint.setColor(Color.DKGRAY/*Color.parseColor("#FFFFFF")*/);
+            //paint.setShadowLayer(0.1f, 1.0f, 1.0f, Color.DKGRAY);
+            canvas.drawText(Float.toString(slice.getValue()), mid_x, mid_y - (paint.descent() + paint.ascent()) / 2, paint);
+            paint.setShadowLayer(0, 0, 0, 0);
+            if (indexSelected == count && listener != null){
 				path.reset();
 				paint.setColor(slice.getColor());
 				paint.setColor(Color.parseColor("#33B5E5"));
@@ -160,7 +174,17 @@ public class PieGraph extends View {
 
 	    return true;
 	}
-	
+
+    //private
+
+    public void setLabel(String type) {
+
+    }
+
+    public Object getLabel() {
+        return null;
+    }
+
 	public ArrayList<PieSlice> getSlices() {
 		return slices;
 	}

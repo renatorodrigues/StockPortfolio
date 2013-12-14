@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="background_light">#e5e5e5</color>
     <color name="dark_gray">#505050</color>
     <color name="stroke">#dddddd</color>
     <color name="card_shadow">#d2d2d2</color>
@@ -15,4 +16,6 @@
     <color name="silver">#bdc3c7</color>
     <color name="concrete">#95a5a6</color>
     <color name="asbestos">#7f8c8d</color>
+    <color name="light_blue">#4387FD</color>
+    <color name="dark_blue">#4683EA</color>
 </resources>

@@ -13,6 +13,24 @@
     <string name="enable_mobile_or_wifi">Enable mobile network or Wi-Fi</string>
     <string name="no_stocks">No stocks</string>
     <string name="add_a_stock">Add a stock</string>
+    <string name="save_my_shares">Save my shares</string>
+    <string name="plus_one">+1</string>
+    <string name="plus_ten">+10</string>
+    <string name="minus_one">-1</string>
+    <string name="minus_ten">-10</string>
+    <string name="edit_my_shares">Edit my shares</string>
+    <string name="value_of_shares">Value of shares</string>
+    <string name="number_of_shares">Number of shares</string>
+    <string name="open">Open</string>
+    <string name="high">High</string>
+    <string name="low">Low</string>
+    <string name="volume">Volume</string>
+    <string name="avg_vol">Avg Vol</string>
+    <string name="mkt_cap">Mkt Cap</string>
+    <string name="value">value</string>
+    <string name="values">Values</string>
+    <string name="history">History</string>
+    <string name="prices">Prices</string>
 
 
     <string-array name="popular_stocks">

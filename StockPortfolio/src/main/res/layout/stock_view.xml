@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card"
+            android:layout_marginBottom="@dimen/activity_vertical_margin">
+            <TextView
+                android:id="@+id/formal_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TitleLight"/>
+
+            <TextView
+                android:id="@+id/company"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"/>
+
+            <FrameLayout
+                android:id="@+id/graph_container"
+                android:layout_width="match_parent"
+                android:layout_height="150dp">
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|center_vertical"
+                    android:indeterminate="true" />
+
+                <com.echo.holographlibrary.LineGraph
+                    android:id="@+id/history_graph"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/quote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/change"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ViewFlipper
+            android:id="@+id/shares_flipper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/number_of_shares"
+                    style="@style/SectionHeaderUnderline"/>
+
+
+                <TextView
+                    android:id="@+id/shares_num"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:gravity="right"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/value_of_shares"
+                    style="@style/SectionHeaderUnderline"/>
+
+                <TextView
+                    android:id="@+id/shares_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:gravity="right"/>
+
+                <TextView
+                    android:id="@+id/edit_shares"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/edit_my_shares"
+                    style="@style/BordlessButton"
+                    android:clickable="true"
+                    android:onClick="editShares"
+                    android:drawableLeft="@drawable/ic_action_edit_blue"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card"
+                android:layout_marginBottom="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="4"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        <Button
+                            android:id="@+id/decrement_ten_shares"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/minus_ten"
+                            style="@style/FlatButton"
+                            android:onClick="updateShares"
+                            android:layout_marginBottom="10dp"/>
+                        <Button
+                            android:id="@+id/decrement_shares"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/minus_one"
+                            style="@style/FlatButton"
+                            android:onClick="updateShares"
+                            android:layout_marginBottom="10dp"/>
+                    </LinearLayout>
+
+
+                    <EditText
+                        android:id="@+id/shares_edit"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:inputType="number"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        <Button
+                            android:id="@+id/increment_ten_shares"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/plus_ten"
+                            style="@style/FlatButton"
+                            android:onClick="updateShares"
+                            android:layout_marginBottom="10dp"/>
+                        <Button
+                            android:id="@+id/increment_shares"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/plus_one"
+                            style="@style/FlatButton"
+                            android:onClick="updateShares"
+                            android:layout_marginBottom="10dp"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/save_shares"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/save_my_shares"
+                    style="@style/BordlessButton"
+                    android:drawableLeft="@drawable/ic_action_save_blue"
+                    android:clickable="true"
+                    android:onClick="saveShares" />
+            </LinearLayout>
+
+        </ViewFlipper>
+
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card">
+
+            <TableRow>
+                <TextView
+                    android:text="@string/open"
+                    style="@style/LightTableLabel"/>
+                <TextView
+                    android:id="@+id/open"
+                    style="@style/LightTableCell"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:text="@string/high"
+                    style="@style/LightTableLabel"/>
+                <TextView
+                    android:id="@+id/high"
+                    style="@style/LightTableCell"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:text="@string/low"
+                    style="@style/LightTableLabel"/>
+                <TextView
+                    android:id="@+id/low"
+                    style="@style/LightTableCell"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:text="@string/volume"
+                    style="@style/LightTableLabel"/>
+                <TextView
+                    android:id="@+id/volume"
+                    style="@style/LightTableCell"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:text="@string/avg_vol"
+                    style="@style/LightTableLabel"/>
+                <TextView
+                    android:id="@+id/avg_vol"
+                    style="@style/LightTableCell"/>
+            </TableRow>
+            <TableRow>
+                <TextView
+                    android:text="@string/mkt_cap"
+                    style="@style/LightTableLabel"/>
+                <TextView
+                    android:id="@+id/mkt_cap"
+                    style="@style/LightTableCell"/>
+            </TableRow>
+
+        </TableLayout>
+    </LinearLayout>
+</ScrollView>

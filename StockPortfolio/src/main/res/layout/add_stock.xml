@@ -39,6 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/activity_vertical_margin"
+        style="@style/FlatButton"
         android:text="@string/add_to_portfolio" />
 
 </LinearLayout>

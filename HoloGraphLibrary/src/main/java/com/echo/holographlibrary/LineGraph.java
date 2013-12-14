@@ -424,13 +424,13 @@ public class LineGraph extends View {
                     for (LinePoint p : line.getPoints()){
                         float yPercent = (p.getY()-minY)/(maxY - minY);
                         float xPercent = (p.getX()-minX)/(maxX - minX);
-                        float xPixels = sidePadding + (xPercent*usableWidth);
+                        float xPixels = sidePadding + (xPercent*usableWidth) + leftPadding;
                         float yPixels = getHeight() - bottomPadding - (usableHeight*yPercent);
 
                         paint.setColor(Color.GRAY);
-                        canvas.drawCircle(xPixels, yPixels, 15, paint);
+                        canvas.drawCircle(xPixels, yPixels, 10, paint);
                         paint.setColor(Color.WHITE);
-                        canvas.drawCircle(xPixels, yPixels, 7, paint);
+                        canvas.drawCircle(xPixels, yPixels, 5, paint);
 
                         Path path2 = new Path();
                         path2.addCircle(xPixels, yPixels, 40, Direction.CW);
@@ -505,6 +505,8 @@ public class LineGraph extends View {
     public void setOnPointClickedListener(OnPointClickedListener listener) {
         this.listener = listener;
     }
+
+
 
     public interface OnPointClickedListener {
         abstract void onClick(int lineIndex, int pointIndex);

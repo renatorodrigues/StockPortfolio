@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:background="@drawable/card">
+
+        <TextView
+            android:id="@+id/formal_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"/>
+
+        <TextView
+            android:id="@+id/company"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/formal_name"/>
+
+        <TextView
+            android:id="@+id/quote"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/company"/>
+
+        <TextView
+            android:id="@+id/change"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/quote"/>
+
+        <TextView
+            android:id="@+id/shares_num_label"
+            android:fontFamily="sans-serif-light"
+            android:textStyle="italic"
+            android:text="shares"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_above="@+id/shares_num"/>
+
+        <TextView
+            android:id="@+id/shares_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_above="@+id/shares_value_label"
+            android:layout_alignParentRight="true"/>
+
+        <TextView
+            android:id="@+id/shares_value_label"
+            android:fontFamily="sans-serif-light"
+            android:textStyle="italic"
+            android:text="@string/value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_above="@+id/shares_value"/>
+
+        <TextView
+            android:id="@+id/shares_value"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignBottom="@+id/change"/>
+
+    </RelativeLayout>
+
+</FrameLayout>

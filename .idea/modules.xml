@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HoloGraphLibrary/HoloGraphLibrary.iml" filepath="$PROJECT_DIR$/HoloGraphLibrary/HoloGraphLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PagerSlidingTabStrip/PagerSlidingTabStrip.iml" filepath="$PROJECT_DIR$/PagerSlidingTabStrip/PagerSlidingTabStrip.iml" />
       <module fileurl="file://$PROJECT_DIR$/StockPortfolio.iml" filepath="$PROJECT_DIR$/StockPortfolio.iml" />
       <module fileurl="file://$PROJECT_DIR$/StockPortfolio/StockPortfolio-StockPortfolio.iml" filepath="$PROJECT_DIR$/StockPortfolio/StockPortfolio-StockPortfolio.iml" />
     </modules>

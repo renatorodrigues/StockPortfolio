@@ -16,8 +16,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:uiOptions="splitActionBarWhenNarrow" >
+        android:theme="@style/AppTheme" >
         <activity
             android:name="edu.feup.stockportfolio.ui.PortfolioActivity"
             android:label="@string/app_name" >
@@ -28,8 +27,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.SharesViewActivity"
+            android:name=".ui.StockViewActivity"
             android:label="@string/title_activity_view_shares" >
+        </activity>
+
+        <activity
+            android:name=".ui.PortfolioDetailsActivity"
+            android:label="Portfolio" >
         </activity>
     </application>
 

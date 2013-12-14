@@ -137,7 +137,7 @@ public class StockData {
     }
 
     public double get_own_quotes_value(){
-        return get_actual_quote() * get_quantity();
+        return Double.parseDouble(String.format("%.2f", get_actual_quote() * get_quantity()));
     }
 
     public Line get_line() { return line_graph_; }

@@ -4,5 +4,5 @@
     <size android:height="1dp"
           android:width="1000dp" />
 
-    <solid android:color="@color/dark_gray" />
+    <solid android:color="@color/card_shadow" />
 </shape>
